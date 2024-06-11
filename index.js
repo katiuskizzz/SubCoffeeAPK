@@ -48,7 +48,7 @@ app.set("view engine", "ejs");
 
 app.set("views", "./view");
 
-app.use(express.static('./public'))
+app.use(express.static('./public') )
 
 app.get("/documents", (req, res) => {
   res.render("documentacion.ejs");
