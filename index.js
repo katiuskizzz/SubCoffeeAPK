@@ -18,8 +18,6 @@ import routertipovari from "./src/routes/tipovariedad.routes.js"
 import ofertasRoutes from "./src/routes/ofertas.routes.js";
 import { PORT } from "./src/config.js";
 
-
-
 const app = express();
 app.use(cors());
 // app.use(cors());
@@ -48,11 +46,12 @@ app.set("view engine", "ejs");
 
 app.set("views", "./view");
 
-app.use(express.static('./public') )
+app.use(express.static('./public'))
 
 app.get("/documents", (req, res) => {
   res.render("documentacion.ejs");
 });
+
 
 app.listen(PORT, () => {
   console.log("Servidor se esta ejecutando en el puerto ", PORT);

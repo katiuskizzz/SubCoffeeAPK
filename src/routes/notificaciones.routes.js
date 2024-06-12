@@ -5,7 +5,7 @@ import { verificarUserToken } from "../controllers/autenticacionController.js";
 
 const rutNotificaciones = Router()
 
-rutNotificaciones.get('/notificaciones', getNotifications)
+rutNotificaciones.get('/notificaciones', verificarUserToken, getNotifications)
 rutNotificaciones.get('/notificaciones/:id', verificarUserToken, getNotification)
 rutNotificaciones.post('/notificaciones', verificarUserToken, validateCreateNotificacion, createNotification)
 rutNotificaciones.put('/notificaciones/:id', verificarUserToken, validateActualizarNotificacion, updateNotification)
