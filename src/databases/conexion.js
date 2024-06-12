@@ -13,7 +13,7 @@ export const pool = createPool({
     host: 'viaduct.proxy.rlwy.net',
     user: 'root',
     password: 'wLyRnZkgvjYsBpkxqVoOzTXKdoyBMwwm',
-    port: 26817,
+    port: '26817',
     database: 'railway'
 })
 
