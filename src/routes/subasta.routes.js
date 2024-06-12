@@ -21,7 +21,7 @@ import { verificarUserToken } from "../controllers/autenticacionController.js";
 const rutasSubastas = Router();
 
 rutasSubastas.post("/subasta", subastaFiles, verificarUserToken, registrar);
-rutasSubastas.get("/subasta", /* verificarUserToken, */ listar);
+rutasSubastas.get("/listar", /* verificarUserToken, */ listar);
 rutasSubastas.get("/subastaganador/:id", verificarUserToken, getSubGanador);
 rutasSubastas.get("/subastasActivasMenosCerradas", verificarUserToken, listarSubsActivas);
 rutasSubastas.put("/subasta/:id", verificarUserToken, subastaFiles, actualizar);
