@@ -9,10 +9,6 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, "../../src/env/.env") });
 
-
-
-
-
 export const pool = createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
