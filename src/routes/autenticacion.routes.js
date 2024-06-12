@@ -1,11 +1,10 @@
-import { validarUser } from "../controllers/autenticacionController.js";
-// verificarUserToken
+import { validarUser, verificarUserToken } from "../controllers/autenticacionController.js";
 import { Router } from "express";
 
 const autenticacionRouter = Router()
 
 autenticacionRouter.post('/login', validarUser);
-// autenticacionRouter.get("/validate", verificarUserToken)
+autenticacionRouter.get("/validate", verificarUserToken)
 
 
 export default autenticacionRouter;

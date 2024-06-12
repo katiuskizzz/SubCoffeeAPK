@@ -1,20 +1,12 @@
-import{Router} from 'express';
-        
+import { Router } from "express";
+import { createPostulacion, deletePostulacion, getPostulacion, getPostulaciones, updatePostulacion } from "../controllers/postulacion.controller.js";
 
- import{getPostulaciones,guardarPostulacion, getPostulacion,updatePostulacion, deletePostulacion} from '../controllers/postulacion.controllers.js';
+const routerPostulacion = Router()
 
-    const postulacionRoutes= Router();
+routerPostulacion.get("/postulacion", getPostulaciones)
+routerPostulacion.get("/postulacion/:id", getPostulacion)
+routerPostulacion.post("/postulacion", createPostulacion)
+routerPostulacion.put("/postulacion/:id", updatePostulacion)
+routerPostulacion.delete("/postulacion/:id", deletePostulacion)
 
-
-
-    // postulacionRoutes.post('/postulacion',guardarPostulacion);
-    // postulacionRoutes.put('/postulacion/:id',editarPostulacion);
-    // postulacionRoutes.delete('/postulacion',eliminarPostulacion);
-    postulacionRoutes.get('/postulacion', getPostulaciones);
-    postulacionRoutes.post('/postulacion', guardarPostulacion);
-    postulacionRoutes.get('/postulacion/:id', getPostulacion);
-    postulacionRoutes.put('/postulacion/:id', updatePostulacion);
-    postulacionRoutes.delete('/postulacion/:id', deletePostulacion)
-
-
-    export default postulacionRoutes;
+export default routerPostulacion

@@ -8,14 +8,18 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.resolve(__dirname, "../../src/env/.env") });
+
+
+
 export const pool = createPool({
-    host: 'viaduct.proxy.rlwy.net',
+    host: 'monorail.proxy.rlwy.net',
     user: 'root',
-    password: 'wLyRnZkgvjYsBpkxqVoOzTXKdoyBMwwm',
-    port: 26817,
-    database: 'railway'
+    password: 'PvpFKCwRAgmvTwJTjvziuTuXnSlqgNqb',
+    port: 30386,
+    database: 'railway',
 })
 
+//Validar conexión a la base de datos
 pool.getConnection().then(connect => {
     console.log("Conexión a base de datos exitosa.");
     connect.release();
