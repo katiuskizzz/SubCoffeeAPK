@@ -12,10 +12,10 @@ dotenv.config({ path: path.resolve(__dirname, "../../src/env/.env") });
 
 
 export const pool = createPool({
-    host: 'viaduct.proxy.rlwy.net',
+    host: 'roundhouse.proxy.rlwy.net',
     user: 'root',
-    password: 'wLyRnZkgvjYsBpkxqVoOzTXKdoyBMwwm',
-    port: 26817,
+    password: 'WgyyuNNOyuwEHyxqhIUDCIPaMiRcohBR',
+    port: 50457,
     database: 'railway',
 })
 
