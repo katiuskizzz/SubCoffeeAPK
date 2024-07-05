@@ -4,7 +4,7 @@ import { validationResult } from "express-validator";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/img/subasta");
+    cb(null, "public/subastas");
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);
@@ -21,7 +21,6 @@ export const subastaFiles = upload.fields([
 export const registrar = async (req, res) => {
   try {
     const errors = validationResult(req);
-
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
@@ -34,16 +33,15 @@ export const registrar = async (req, res) => {
     const [resultado] = await pool.query("INSERT INTO subasta (fecha_inicio_sub, fecha_fin_sub, imagen_sub, precio_inicial_sub, unidad_peso_sub, cantidad_sub, estado_sub, certificado_sub, descripcion_sub, fk_variedad) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [ fecha_inicio_sub, fecha_fin_sub, imagen_sub, precio_inicial_sub, unidad_peso_sub, cantidad_sub, "abierta", certificado_sub, descripcion_sub, fk_variedad, ]);
 
     if (resultado.affectedRows > 0) {
-      res.status(200).json({ message: "Su subasta ha sido creada con exito" });
+      res.status(200).json({ message: "Subasta creada con éxito" });
     } else {
-      res.status(400).json({ message: "Error al insertar la subasta" });
+      res.status(400).json({ message: "Error al crear la subasta" });
     }
   } catch (error) {
-    res.status(500).json({message: "Error interno del servidor",});
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
 };
 
-// lista todas las subastas en progreso
 export const listar = async (req, res) => {
   try {
     const [resultado] = await pool.query(
@@ -62,10 +60,10 @@ export const listar = async (req, res) => {
     if (resultado.length > 0) {
       res.status(200).json(resultado);
     } else {
-      res.status(404).json({message: "No se encontraron subastas ",});
+      res.status(404).json({ message: "No se encontraron subastas" });
     }
   } catch (error) {
-    res.status(500).json({message: "Error interno del servidor",});
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
 };
 
@@ -89,10 +87,10 @@ export const getSubGanador = async (req, res) => {
       if (resultado.length > 0) {
         res.status(200).json(resultado);
       } else {
-        res.status(200).json({message: "No se encontraron subastas ganadas por este usuario",});
+        res.status(200).json({ message: "No se encontraron subastas ganadas por este usuario",});
       }
   } catch (error) {
-    res.status(500).json({message: "Error interno del servidor",});
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
 }
 
@@ -109,33 +107,36 @@ export const listarSubsActivas = async (req, res) => {
       INNER JOIN tipo_variedad t ON v.fk_tipo_variedad = t.pk_id_tipo_vari 
       INNER JOIN usuarios u ON f.fk_id_usuario = u.pk_cedula_user
       WHERE s.estado_sub IN ('abierta', 'proceso', 'espera')
-      ORDER BY t.nombre_tipo_vari
+      ORDER BY s.pk_id_sub
     `);
 
     if (resultado.length > 0) {
       res.status(200).json(resultado);
     } else {
-      res.status(200).json({message: "No se encontraron subastas.",});
+      res.status(200).json({ message: "No se encontraron subastas." });
     }
   } catch (error) {
-    res.status(500).json({message: "Error interno del servidor",});
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
 };
 
-export const actualizarFechaFin = async() => {
+export const updateSubGanador = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { fecha_fin_sub } = req.body
-    const [resultado] = await pool.query(`UPDATE subasta SET fecha_fin_sub = IFNULL( ?,'${fecha_fin_sub}') WHERE  pk_id_sub = ?`, [id]);
-    if (resultado.length > 0) {
-      res.status(200).json({message:"Fecha actualizada con exito"})
+    const id = req.params.id;
+    const { precio_final_sub, ganador_sub } = req.body;
+
+    const sql = "UPDATE subasta SET precio_final_sub = IFNULL(?, precio_final_sub), ganador_sub = IFNULL(?, ganador_sub) WHERE pk_id_sub = ?";
+    const [result] = await pool.query(sql, [precio_final_sub, ganador_sub, id]);
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: "Se estableció el ganador con éxito" });
     } else {
-      res.status(404).json({message:"Error al actualizar la fecha"})
+      res.status(404).json({ message: "Error al establecer el ganador de la subasta" });
     }
   } catch (error) {
-    res.status(500).json({message: "Error interno del servidor",});
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
-}
+};
 
 export const actualizar = async (req, res) => {
   try {
@@ -145,7 +146,7 @@ export const actualizar = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { fecha_inicio_sub, fecha_fin_sub, precio_inicial_sub, precio_final_sub, unidad_peso_sub, cantidad_sub, descripcion_sub, fk_variedad, } = req.body;
+    const { fecha_inicio_sub, fecha_fin_sub, precio_inicial_sub, unidad_peso_sub, cantidad_sub, descripcion_sub, fk_variedad, } = req.body;
 
     const imagen_sub = req.files && req.files.imagen_sub ? req.files.imagen_sub[0].originalname : null;
     const certificado_sub = req.files && req.files.certificado_sub ? req.files.certificado_sub[0].originalname : null;
@@ -155,13 +156,12 @@ export const actualizar = async (req, res) => {
       fecha_inicio_sub = IFNULL(?, fecha_inicio_sub),
       fecha_fin_sub = IFNULL(?, fecha_fin_sub),
       precio_inicial_sub = IFNULL(?, precio_inicial_sub),
-      precio_final_sub = IFNULL(?, precio_final_sub),
       unidad_peso_sub = IFNULL(?, unidad_peso_sub),
       cantidad_sub = IFNULL(?, cantidad_sub),
       descripcion_sub = IFNULL(?, descripcion_sub),
       fk_variedad = IFNULL(?, fk_variedad)
     `;
-    const params = [ fecha_inicio_sub, fecha_fin_sub, precio_inicial_sub, precio_final_sub, unidad_peso_sub, cantidad_sub, descripcion_sub, fk_variedad, ];
+    const params = [ fecha_inicio_sub, fecha_fin_sub, precio_inicial_sub, unidad_peso_sub, cantidad_sub, descripcion_sub, fk_variedad, ];
 
     if (imagen_sub) {
       sql += `, imagen_sub = ?`;
@@ -179,17 +179,15 @@ export const actualizar = async (req, res) => {
     const [result] = await pool.query(sql, params);
 
     if (result.affectedRows > 0) {
-      res.status(200).json({ message: "La subasta ha sido actualizada exitosamente" });
+      res.status(200).json({ message: "Subasta actualizada exitosamente" });
     } else {
-      res.status(404).json({ message: "No se encontró ninguna subasta con el id proporcionado" });
+      res.status(404).json({ message: "Error al actualizar la subasta" });
     }
   } catch (error) {
-    console.error("Error en el sistema:", error); // Agrega un log del error para debug
-    res.status(500).json({ message: "Error interno del servidor" });
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
 };
 
-// busca una subasta
 export const buscar = async (req, res) => {
   try {
     const subastaId = req.params.id;
@@ -215,12 +213,12 @@ export const buscar = async (req, res) => {
     );
 
     if (resultado.length > 0) {
-      res.status(200).json({message: "Datos de subasta obtenidos correctamente",data: resultado[0],});
+      res.status(200).json({ message: "Datos de subasta obtenidos correctamente",data: resultado[0] });
     } else {
-      res.status(404).json({message: "No se encontró ninguna subasta con el id consultado.",});
+      res.status(404).json({ message: "No se encontró ninguna subasta con el id consultado." });
     }
   } catch (error) {
-    res.status(500).json({message: "Error interno del servidor",});
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
 };
 
@@ -247,18 +245,16 @@ export const buscarSubastaForUser = async (req, res) => {
     );
 
     if (resultado.length > 0) {
-      res.status(200).json({ message: "Datos de subasta obtenidos correctamente", data: resultado, });
+      res.status(200).json({ message: "Datos de subasta obtenidos correctamente", data: resultado });
     } else {
-      res.status(204).json({message: "No se encontraron subastas para el usuario proporcionado.",})
+      res.status(204).json({ message: "No se encontraron subastas para el usuario proporcionado." })
     }
   } catch (error) {
-    res.status(500).json({ message: "Error interno del servidor", });
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
 };
 
-
-// elimina una subasta
-/* export const eliminar = async (req, res) => {
+export const eliminar = async (req, res) => {
   try {
     const id = req.params.id;
     const [resultado] = await pool.query("DELETE FROM subasta WHERE pk_id_sub = ?",[id]);
@@ -269,9 +265,24 @@ export const buscarSubastaForUser = async (req, res) => {
       res.status(404).json({ message: "No se encontró una subasta con el id proporcionado." });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error interno del servidor" });
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
-}; */
+};
+
+export const designarDatos = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const [resultado] = await pool.query("UPDATE subasta SET precio_final_sub = NULL, ganador_sub = NULL WHERE pk_id_sub = ?", [id]);
+
+    if (resultado.affectedRows > 0) {
+      res.status(200).json({ message: "Datos de subasta cambiados exitosamente." });
+    } else {
+      res.status(404).json({ message: "No se encontró una subasta con el ID proporcionado." });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error en el servidor " + error });
+  }
+};
 
 export const SubastaAbierta = async (req, res) => {
   const id = req.params.id;
@@ -280,10 +291,10 @@ export const SubastaAbierta = async (req, res) => {
     if (result.affectedRows > 0) {
       res.status(200).json({ message: "Subasta activada exitosamente" });
     } else {
-      res.status(404).json({ message: `No se encontró ninguna Subasta con el ID ${id}` });
+      res.status(404).json({ message: `No se encontró ninguna Subasta con el ID` });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error en el sistema", error: error.message });
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
 };
 
@@ -292,12 +303,12 @@ export const SubastaEspera = async (req, res) => {
   try {
     const [result] = await pool.query(`UPDATE subasta SET estado_sub = 2 WHERE pk_id_sub = ${id}`);
     if (result.affectedRows > 0) {
-      res.status(200).json({ message: "Subasta en Espera " });
+      res.status(200).json({ message: "Subasta en Espera" });
     } else {
-      res.status(404).json({ message: `No se encontró ninguna Subasta con el ID ${id}` });
+      res.status(404).json({ message: `No se encontró ninguna Subasta con el ID` });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error en el sistema", error: error.message });
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
 };
 
@@ -308,10 +319,10 @@ export const SubastaCerrada = async (req, res) => {
     if (result.affectedRows > 0) {
       res.status(200).json({ message: "Subasta cerrada exitosamente" });
     } else {
-      res.status(404).json({ message: `No se encontró ninguna Subasta con el ID ${id}` });
+      res.status(404).json({ message: `No se encontró ninguna Subasta con el ID` });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error en el sistema", error: error.message });
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
 };
 
@@ -322,9 +333,9 @@ export const SubastaProceso = async (req, res) => {
     if (result.affectedRows > 0) {
       res.status(200).json({ message: "Subasta en Proceso" });
     } else {
-      res.status(404).json({ message: `No se encontró ninguna Subasta con el ID ${id}` });
+      res.status(404).json({ message: `No se encontró ninguna Subasta con el ID` });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error en el sistema", error: error.message });
+    res.status(500).json({ message: "Error en el servidor " + error });
   }
 };

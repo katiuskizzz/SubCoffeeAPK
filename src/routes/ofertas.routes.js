@@ -1,20 +1,15 @@
-import{Router} from 'express';
- import { validarActualizarOfertas,validarRegistrarOfertas } from '../validations/ofertas.validacion.js';
- import { verificarUserToken } from '../controllers/autenticacionController.js';
-import { listarOfertas,guardarOfertas,buscarOferta,atualizarOfertas,eliminarOferta } from '../controllers/ofertas.Controller.js';
+import { Router } from 'express';
+import { validarOfertas } from '../validations/ofertas.validacion.js';
+import { verificarUserToken } from '../controllers/autenticacionController.js';
+import { listarOfertas, guardarOfertas, buscarOferta, atualizarOfertas, eliminarOferta, buscarOfertaMayor } from '../controllers/ofertas.Controller.js';
 
-    const ofertasRoutes= Router();
-  ofertasRoutes.post('/oferta',verificarUserToken,validarRegistrarOfertas, guardarOfertas);
+const routerOferta = Router();
 
-    ofertasRoutes.get('/oferta',verificarUserToken, listarOfertas);
-  
-    ofertasRoutes.put('/oferta/:id',verificarUserToken, validarActualizarOfertas,atualizarOfertas );
+routerOferta.post('/oferta', verificarUserToken, validarOfertas, guardarOfertas);
+routerOferta.get('/oferta', verificarUserToken, listarOfertas);
+routerOferta.put('/oferta/:id', verificarUserToken, validarOfertas, atualizarOfertas);
+routerOferta.get('/oferta/:id', verificarUserToken, buscarOferta);
+routerOferta.get('/ofertamayor/:id', verificarUserToken, buscarOfertaMayor);
+routerOferta.delete('/oferta/:id/:user', verificarUserToken, eliminarOferta);
 
-    ofertasRoutes.get('/oferta/:id',verificarUserToken, buscarOferta);
-
-    ofertasRoutes.delete('/oferta/:id',verificarUserToken, eliminarOferta);
-
-
-
-    export default ofertasRoutes;
-   
+export default routerOferta;
