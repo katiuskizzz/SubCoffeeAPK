@@ -12,10 +12,10 @@ dotenv.config({ path: path.resolve(__dirname, "../../src/env/.env") });
 
 
 export const pool = createPool({
-    host: 'monorail.proxy.rlwy.net',
+    host: 'viaduct.proxy.rlwy.net',
     user: 'root',
-    password: 'PvpFKCwRAgmvTwJTjvziuTuXnSlqgNqb',
-    port: 30386,
+    password: 'wLyRnZkgvjYsBpkxqVoOzTXKdoyBMwwm',
+    port: 26817,
     database: 'railway',
 })
 
