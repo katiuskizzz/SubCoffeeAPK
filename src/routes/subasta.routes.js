@@ -22,7 +22,7 @@ import { verificarUserToken } from "../controllers/autenticacionController.js";
 const routerSubasta = Router();
 
 routerSubasta.post("/subasta", subastaFiles, verificarUserToken, registrar);
-routerSubasta.get("/subasta", verificarUserToken, listar);
+routerSubasta.get("/subasta", listar);
 routerSubasta.put("/subasta/:id", verificarUserToken, subastaFiles, actualizar);
 routerSubasta.get("/buscar/:id", verificarUserToken, buscar); 
 routerSubasta.delete("/eliminar/:id", verificarUserToken, eliminar);
