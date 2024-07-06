@@ -98,37 +98,47 @@ export const verificarCodigo = async (req, res) => {
 };
 
 
-  export const cambiarContrasenaConCodigo = async (req, res) => {
-    const { nuevaContrasena } = req.body;
-    const email_user = req.session.email_user;  // Recuperar el email de la sesión
-  
-    if (!email_user) {
-      return res.status(400).json({ mensaje: 'Correo electrónico no encontrado en la sesión' });
+
+
+
+
+export const cambiarContrasenaConCodigo = async (req, res) => {
+  const { nuevaContrasena, confirmNewPassword } = req.body;
+  const email_user = req.session.email_user;
+
+  if (!email_user) {
+    return res.status(400).json({ mensaje: 'Correo electrónico no encontrado en la sesión' });
+  }
+
+  try {
+    const query = 'SELECT pk_cedula_user, reset_code, reset_code_expires, password_user FROM usuarios WHERE email_user = ?';
+    const [rows] = await pool.query(query, [email_user]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
     }
-  
-    try {
-      const query = 'SELECT pk_cedula_user, reset_code, reset_code_expires FROM usuarios WHERE email_user = ?';
-      const [rows] = await pool.query(query, [email_user]);
-  
-      if (rows.length === 0) {
-        return res.status(404).json({ mensaje: 'Usuario no encontrado' });
-      }
-  
-      const usuario = rows[0];
-  
-      if (new Date(usuario.reset_code_expires) < new Date()) {
-        return res.status(400).json({ mensaje: 'Código inválido o expirado' });
-      }
-  
-      const hashedPassword = await bcrypt.hash(nuevaContrasena, 10);
-  
-      const updateQuery = 'UPDATE usuarios SET password = ?, reset_code = NULL, reset_code_expires = NULL WHERE email_user = ?';
-      await pool.query(updateQuery, [hashedPassword, email_user]);
-  
-      return res.status(200).json({ mensaje: 'Contraseña cambiada exitosamente' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ mensaje: 'Error del servidor' });
+
+    const usuario = rows[0];
+
+    if (new Date(usuario.reset_code_expires) < new Date()) {
+      return res.status(400).json({ mensaje: 'Código inválido o expirado' });
     }
-  };
-  
+
+    // Verificar que las contraseñas coincidan
+    if (nuevaContrasena !== confirmNewPassword) {
+      return res.status(400).json({ mensaje: 'La nueva contraseña y la confirmación no coinciden' });
+    }
+
+    // Encriptar la nueva contraseña
+    const hashedPassword = await bcrypt.hash(nuevaContrasena, 10);
+
+    // Actualizar la contraseña en la base de datos
+    const updateQuery = 'UPDATE usuarios SET password_user = ?, reset_code = NULL, reset_code_expires = NULL WHERE email_user = ?';
+    await pool.query(updateQuery, [hashedPassword, email_user]);
+
+    return res.status(200).json({ mensaje: 'Contraseña cambiada exitosamente' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ mensaje: 'Error del servidor' });
+  }
+};
