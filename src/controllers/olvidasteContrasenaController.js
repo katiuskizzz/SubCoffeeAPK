@@ -78,26 +78,25 @@ export const solicitarCambioContrasena = async (req, res) => {
 };
 
 
-
 export const verificarCodigo = async (req, res) => {
-    const { email_user, codigo } = req.body;
-  
-    try {
-      // Verificar si el código es correcto y no ha expirado
-      const query = 'SELECT pk_cedula_user FROM usuarios WHERE email_user = ? AND reset_code = ? AND reset_code_expires > NOW()';
-      const [rows] = await pool.query(query, [email_user, codigo]);
-  
-      if (rows.length === 0) {
-        return res.status(400).json({ mensaje: 'Código incorrecto o expirado' });
-      }
-  
-      return res.status(200).json({ mensaje: 'Código verificado correctamente' });
-    } catch (error) {
-      console.error('Error del servidor:', error);
-      return res.status(500).json({ mensaje: 'Error del servidor' });
+  const { codigo } = req.body;
+
+  try {
+    // Verificar si el código es correcto y no ha expirado
+    const query = 'SELECT pk_cedula_user FROM usuarios WHERE reset_code = ? AND reset_code_expires > NOW()';
+    const [rows] = await pool.query(query, [codigo]);
+
+    if (rows.length === 0) {
+      return res.status(400).json({ mensaje: 'Código incorrecto o expirado' });
     }
-  };
-  
+
+    return res.status(200).json({ mensaje: 'Código verificado correctamente' });
+  } catch (error) {
+    console.error('Error del servidor:', error);
+    return res.status(500).json({ mensaje: 'Error del servidor' });
+  }
+};
+
 
   export const cambiarContrasenaConCodigo = async (req, res) => {
     const { nuevaContrasena } = req.body;

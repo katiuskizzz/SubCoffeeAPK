@@ -48,12 +48,15 @@ export const createNotification = async (req, res) => {
       [tipo_not, texto_not, fk_id_subasta, fk_id_usuario]
     );
     if (rows.affectedRows) {
-      res.status(200).json({ status: 200, message: "Notificación creada exitosamente." });} else {
-      res.status(404).json({ status: 404, message: "Error al crear la notificación." });}
+      res.status(200).json({ status: 200, message: "Notificación creada exitosamente." });
+    } else {
+      res.status(404).json({ status: 404, message: "Error al crear la notificación." });
+    }
   } catch (error) {
     res.status(500).json({ status: 500, message: "Error en el sistema." });
   }
 };
+
 
 export const updateNotification = async (req, res) => {
   try {

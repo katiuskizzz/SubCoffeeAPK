@@ -18,6 +18,7 @@ export const subastaFiles = upload.fields([
   { name: "certificado_sub", maxCount: 1 },
 ]);
 
+
 export const registrar = async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -30,10 +31,21 @@ export const registrar = async (req, res) => {
     let imagen_sub = req.files && req.files["imagen_sub"] ? req.files["imagen_sub"][0].originalname : null;
     let certificado_sub = req.files && req.files["certificado_sub"] ? req.files["certificado_sub"][0].originalname : null;
 
-    const [resultado] = await pool.query("INSERT INTO subasta (fecha_inicio_sub, fecha_fin_sub, imagen_sub, precio_inicial_sub, unidad_peso_sub, cantidad_sub, estado_sub, certificado_sub, descripcion_sub, fk_variedad) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [ fecha_inicio_sub, fecha_fin_sub, imagen_sub, precio_inicial_sub, unidad_peso_sub, cantidad_sub, "abierta", certificado_sub, descripcion_sub, fk_variedad, ]);
+    const [resultado] = await pool.query("INSERT INTO subasta (fecha_inicio_sub, fecha_fin_sub, imagen_sub, precio_inicial_sub, unidad_peso_sub, cantidad_sub, estado_sub, certificado_sub, descripcion_sub, fk_variedad) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [ fecha_inicio_sub, fecha_fin_sub, imagen_sub, precio_inicial_sub, unidad_peso_sub, cantidad_sub, "abierta", certificado_sub, descripcion_sub, fk_variedad ]);
 
     if (resultado.affectedRows > 0) {
-      res.status(200).json({ message: "Subasta creada con éxito" });
+      // Crear notificación
+      const tipo_not = "mensaje";
+      const texto_not = `Se ha creado una nueva subasta con ID: ${resultado.insertId}`;
+      const fk_id_subasta = resultado.insertId;
+      const fk_id_usuario = req.body.fk_id_usuario; 
+
+      await pool.query(
+        "INSERT INTO notificaciones (tipo_not, texto_not, fk_id_subasta, fk_id_usuario) VALUES (?, ?, ?, ?)",
+        [tipo_not, texto_not, fk_id_subasta, fk_id_usuario]
+      );
+
+      res.status(200).json({ message: "Subasta y notificación creadas con éxito" });
     } else {
       res.status(400).json({ message: "Error al crear la subasta" });
     }
@@ -41,6 +53,8 @@ export const registrar = async (req, res) => {
     res.status(500).json({ message: "Error en el servidor " + error });
   }
 };
+
+
 
 export const listar = async (req, res) => {
   try {
