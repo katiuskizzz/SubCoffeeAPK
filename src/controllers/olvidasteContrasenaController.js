@@ -124,17 +124,14 @@ export const cambiarContrasenaConCodigo = async (req, res) => {
       return res.status(400).json({ mensaje: 'Código inválido o expirado' });
     }
 
-    // Verificar que las contraseñas coincidan
     if (nuevaContrasena !== confirmNewPassword) {
       return res.status(400).json({ mensaje: 'La nueva contraseña y la confirmación no coinciden' });
     }
 
-    // Encriptar la nueva contraseña
-    const hashedPassword = await bcrypt.hash(nuevaContrasena, 10);
+    const bcryptPassword = bcrypt.hashSync(newPassword, 12);
 
-    // Actualizar la contraseña en la base de datos
     const updateQuery = 'UPDATE usuarios SET password_user = ?, reset_code = NULL, reset_code_expires = NULL WHERE email_user = ?';
-    await pool.query(updateQuery, [hashedPassword, email_user]);
+    await pool.query(updateQuery, [bcryptPassword, email_user]);
 
     return res.status(200).json({ mensaje: 'Contraseña cambiada exitosamente' });
   } catch (error) {
