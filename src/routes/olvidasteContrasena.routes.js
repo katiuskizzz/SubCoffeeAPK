@@ -5,6 +5,6 @@ const olvidePassword = Router();
 
 olvidePassword.post('/solicitarCambioContrasena', solicitarCambioContrasena);
 olvidePassword.post('/verificarCodigo', verificarCodigo);
-olvidePassword.post('/cambiarContrasenaConCodigo', cambiarContrasenaConCodigo);
+olvidePassword.put('/cambiarContrasenaConCodigo', cambiarContrasenaConCodigo);
 
 export default olvidePassword;
