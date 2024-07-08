@@ -14,8 +14,8 @@ dotenv.config({ path: path.resolve(__dirname, "../../src/env/.env") });
 export const pool = createPool({
     host: 'roundhouse.proxy.rlwy.net',
     user: 'root',
-    password: 'WgyyuNNOyuwEHyxqhIUDCIPaMiRcohBR',
-    port: 50457,
+    password: 'OrPXQftlQeGOczmBbgTbTtavNFFtiHAs',
+    port: 34095,
     database: 'railway',
 })
 
