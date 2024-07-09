@@ -18,15 +18,10 @@ export const subastaFiles = upload.fields([
   { name: "certificado_sub", maxCount: 1 },
 ]);
 
-
-
-
 export const registrar = async (req, res) => {
   try {
-    //veo si hay errores en la solicitud
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      //si hay errores la solicitu no pasa pero si no los hay pasa correctamente
       return res.status(400).json({ errors: errors.array() });
     }
 
@@ -34,27 +29,21 @@ export const registrar = async (req, res) => {
 
     let imagen_sub = req.files && req.files["imagen_sub"] ? req.files["imagen_sub"][0].originalname : null;
     let certificado_sub = req.files && req.files["certificado_sub"] ? req.files["certificado_sub"][0].originalname : null;
-//etxraigo los datos que estaran en la solicitud y manejo los formatos de la imagenes y el archivo 
-
 
     const userId = req.params.id;
 
-    // console.log("UserId obtenido:", userId); 
+    console.log("UserId obtenido:", userId); 
 
     const [resultado] = await pool.query("INSERT INTO subasta (fecha_inicio_sub, fecha_fin_sub, imagen_sub, precio_inicial_sub, unidad_peso_sub, cantidad_sub, estado_sub, certificado_sub, descripcion_sub, fk_variedad) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [ fecha_inicio_sub, fecha_fin_sub, imagen_sub, precio_inicial_sub, unidad_peso_sub, cantidad_sub, "abierta", certificado_sub, descripcion_sub, fk_variedad ]);
-        //ejecuto la consulta sql para meter los datos en la tabla 'subastas'  y pool.query para ejecutar la consulta preparada con los valores proporcionados en el array.
 
     if (resultado.affectedRows > 0) {
       const subastaId = resultado.insertId;
-      //verifica sila insercion se hizo correctamente si esa asi se procede a crear la notificacion
 
-      // Verificar si userId está definido y es un número válido
-      //compruebo si es numero con Nan
       if (userId && !isNaN(userId)) {
         const tipoNotificacion = "mensaje";
 
-        //insertar notificación en la tabla 'notificaciones'
         const [resultadoNotif] = await pool.query("INSERT INTO notificaciones (tipo_not, texto_not, fk_id_subasta, fk_id_usuario) VALUES (?, ?, ?, ?)", [tipoNotificacion, "Nueva subasta creada", subastaId, userId ]);
+
         if (resultadoNotif.affectedRows > 0) {
           res.status(200).json({ message: "Subasta creada con éxito y notificación enviada" });
         } else {
@@ -70,7 +59,6 @@ export const registrar = async (req, res) => {
     res.status(500).json({ message: "Error en el servidor " + error });
   }
 };
-
 
 export const listar = async (req, res) => {
   try {

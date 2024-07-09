@@ -16,17 +16,15 @@ import routertipovari from "./src/routes/tipovariedad.routes.js"
 import routerOferta from "./src/routes/ofertas.routes.js";
 import routerCalificaciones from "./src/routes/calificaciones.routes.js";
 import routerSubasta from "./src/routes/subasta.routes.js";
-import olvidePassword from "./src/routes/olvidasteContrasena.routes.js";
 import { PORT } from "./src/config.js";
 
 const app = express();
 app.use(cors());
 
+
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(express.static(path.join(__dirname, 'public')));
-
 
 app.use("/auth", autenticacionRouter);
 app.use("/v1", routerUser);
@@ -41,7 +39,6 @@ app.use("/v1", routerNotificaciones);
 app.use("/v1", routerPostulantes);
 app.use("/v1", routerOferta);
 app.use("/v1", routerCalificaciones);
-app.use("/v1", olvidePassword);
 
 app.set("view engine", "ejs");
 app.set("views", "./view");
@@ -50,6 +47,7 @@ app.use(express.static('./public'))
 app.get("/documents", (req, res) => {
   res.render("documentacion.ejs");
 });
+
 app.listen(PORT, () => {
   console.log("Servidor se esta ejecutando en el puerto: ", PORT);
 }); 
