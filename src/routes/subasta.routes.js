@@ -26,7 +26,7 @@ routerSubasta.post("/subasta/:id", subastaFiles, verificarUserToken, registrar);
 
 routerSubasta.get("/subasta", listar);
 routerSubasta.put("/subasta/:id", verificarUserToken, subastaFiles, actualizar);
-routerSubasta.get("/buscar/:id", verificarUserToken, buscar); 
+routerSubasta.get("/buscar/:id", buscar); 
 routerSubasta.delete("/eliminar/:id", verificarUserToken, eliminar);
 routerSubasta.put("/subastaac/:id", verificarUserToken, SubastaAbierta);
 routerSubasta.put("/subastades/:id", verificarUserToken, SubastaCerrada);
